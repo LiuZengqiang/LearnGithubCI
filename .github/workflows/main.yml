@@ -15,6 +15,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y git
+          sudo apt install -y texlive-koma-script
 
       - name: Checkout repository
         uses: actions/checkout@v4
