@@ -1,43 +1,101 @@
-name: Markdown to PDF
+# name: Markdown to PDF
+
+# on:
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'main.md'  # 仅在 main.md 文件更改时触发
+
+# jobs:
+#   convert:
+#     runs-on: ubuntu-latest
+#     steps:
+#       # 检出代码
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
+
+#       # 安装 Pandoc
+#       - name: Install Pandoc
+#         run: sudo apt-get install -y pandoc
+
+#       # 安装 LaTeX
+#       - name: Install LaTeX
+#         run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
+
+#       # 将 main.md 转换为 main.tex
+#       - name: Convert Markdown to LaTeX
+#         run: pandoc -s main.md -o main.tex
+
+#       # 将 main.tex 编译为 main.pdf
+# #      - name: Compile LaTeX to PDF
+# #        run: pdflatex main.tex
+
+#       # 将生成的 PDF 文件提交回仓库
+#       - name: Commit PDF to repository
+#         run: |
+#           git config --global user.name "github-actions[bot]"
+#           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+#           git add main.tex
+#           git commit -m "Auto-generated main.tex from main.md" || echo "No changes to commit"
+#           git push origin main
+
+name: Convert Modified Markdown to LaTeX
 
 on:
   push:
-    branches:
-      - main
     paths:
-      - 'main.md'  # 仅在 main.md 文件更改时触发
+      - "*.md"  # 仅当主目录下的 .md 文件变更时触发
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   convert:
     runs-on: ubuntu-latest
+
     steps:
-      # 检出代码
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false  # 禁用默认身份验证，手动使用 GITHUB_TOKEN
 
       # 安装 Pandoc
       - name: Install Pandoc
-        run: sudo apt-get install -y pandoc
-
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+      
       # 安装 LaTeX
       - name: Install LaTeX
         run: sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
 
-      # 将 main.md 转换为 main.tex
+      - name: Detect modified .md files
+        id: changed-files
+        run: |
+          git fetch origin main  # 获取最新的 main 分支
+          MODIFIED_FILES=$(git diff --name-only origin/main HEAD -- "*.md")  # 获取所有修改的 .md 文件
+          if [[ -z "$MODIFIED_FILES" ]]; then
+            echo "No modified .md files."
+            echo "modified=0" >> $GITHUB_ENV  # 记录环境变量，避免后续步骤执行
+          else
+            echo "Detected modified files: $MODIFIED_FILES"
+            echo "$MODIFIED_FILES" > changed_files.txt  # 保存到文件，供后续步骤使用
+            echo "modified=1" >> $GITHUB_ENV  # 记录环境变量
+          fi
+
       - name: Convert Markdown to LaTeX
-        run: pandoc -s main.md -o main.tex
+        if: env.modified == '1'  # 仅当有修改时执行
+        run: |
+          while IFS= read -r file; do
+            output_file="${file%.md}.tex"  # 将 .md 后缀改为 .tex
+            pandoc "$file" -o "$output_file" --template "./eisvogel.latex"
+            echo "Converted $file -> $output_file"
+          done < changed_files.txt
 
-      # 将 main.tex 编译为 main.pdf
-#      - name: Compile LaTeX to PDF
-#        run: pdflatex main.tex
-
-      # 将生成的 PDF 文件提交回仓库
-      - name: Commit PDF to repository
+      - name: Commit and push changes
+        if: env.modified == '1'  # 仅当有修改时执行
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git add main.tex
-          git commit -m "Auto-generated main.tex from main.md" || echo "No changes to commit"
+          git add *.tex
+          git commit -m "Auto-generated .tex files from modified .md files" || echo "No changes to commit"
           git push origin main
-
