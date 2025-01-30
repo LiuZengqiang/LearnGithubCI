@@ -75,6 +75,7 @@ jobs:
       - name: Detect modified .md files
         id: changed-files
         run: |
+        	git config --global --add safe.directory /__w/LearnGithubCI/LearnGithubCI
           git fetch origin main  # 获取最新的 main 分支
           MODIFIED_FILES=$(git diff --name-only origin/main HEAD~1 HEAD -- "*.md")  # 获取所有修改的 .md 文件
           if [[ -z "$MODIFIED_FILES" ]]; then
