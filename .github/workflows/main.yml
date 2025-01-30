@@ -52,16 +52,16 @@ on:
 jobs:
   convert:
     runs-on: ubuntu-latest
-    container: danteev/texlive:latest  # 使用预装 LaTeX 的 Docker 镜像
+    container: pandoc/latex	
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: false  # 禁用默认身份验证，手动使用 GITHUB_TOKEN
 
-      # 安装 Pandoc
-      - name: Install Pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+      # # 安装 Pandoc
+      # - name: Install Pandoc
+      #   run: sudo apt-get update && sudo apt-get install -y pandoc
       
       # # 安装 LaTeX
       # - name: Install LaTeX
