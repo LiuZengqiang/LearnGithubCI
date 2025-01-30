@@ -49,8 +49,8 @@ jobs:
         if: env.modified == '1'  # 仅当有修改时执行
         run: |
           while IFS= read -r file; do
-            output_file="${file%.md}.tex"  # 将 .md 后缀改为 .tex
-            pandoc "$file" -o "$output_file" --template "./eisvogel.latex"
+            output_file="${file%.md}.pdf"  # 将 .md 后缀改为 .pdf
+            pandoc --pdf-engine=xelatex -v CJKmainfont="Microsoft YaHei" "$file" -o "$output_file" --template "./eisvgel.latex"
             echo "Converted $file -> $output_file"
           done < changed_files.txt
 
