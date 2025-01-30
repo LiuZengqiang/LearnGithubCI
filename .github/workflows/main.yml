@@ -71,7 +71,7 @@ jobs:
         id: changed-files
         run: |
           git fetch origin main  # 获取最新的 main 分支
-          MODIFIED_FILES=$(git diff --name-only origin/main HEAD -- "*.md" | grep -Ev "readme.md|README.MD")  # 获取所有修改的 .md 文件
+          MODIFIED_FILES=$(git diff --name-only origin/main HEAD -- "*.md")  # 获取所有修改的 .md 文件
           if [[ -z "$MODIFIED_FILES" ]]; then
             echo "No modified .md files."
             echo "modified=0" >> $GITHUB_ENV  # 记录环境变量，避免后续步骤执行
