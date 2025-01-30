@@ -28,14 +28,14 @@ jobs:
         run: pandoc -s main.md -o main.tex
 
       # 将 main.tex 编译为 main.pdf
-      - name: Compile LaTeX to PDF
-        run: pdflatex main.tex
+#      - name: Compile LaTeX to PDF
+#        run: pdflatex main.tex
 
       # 将生成的 PDF 文件提交回仓库
       - name: Commit PDF to repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add main.pdf
+          git add main.tex
           git commit -m "Auto-generated PDF from main.md"
           git push
