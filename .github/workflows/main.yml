@@ -52,7 +52,7 @@ on:
 jobs:
   convert:
     runs-on: ubuntu-latest
-    container: pandoc/latex	
+    container: pandoc/latex:latest-ubuntu
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
