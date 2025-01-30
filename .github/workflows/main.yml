@@ -50,7 +50,7 @@ jobs:
         run: |
           while IFS= read -r file; do
             output_file="${file%.md}.pdf"  # 将 .md 后缀改为 .pdf
-            pandoc --pdf-engine=xelatex -v CJKmainfont="Microsoft YaHei" "$file" -o "$output_file" --template "./eisvgel.latex"
+            pandoc --pdf-engine=xelatex -v CJKmainfont="Noto Sans CJK SC" "$file" -o "$output_file" --template "./eisvogel.latex"
             echo "Converted $file -> $output_file"
           done < changed_files.txt
 
