@@ -36,7 +36,7 @@ jobs:
           git config --global --add safe.directory /__w/LearnGithubCI/LearnGithubCI
           git fetch --unshallow
           git log --oneline
-          MODIFIED_FILES=$(git diff --name-only HEAD~1 HEAD -- "*.md")  # 获取所有修改的 .md 文件
+          MODIFIED_FILES=$(git diff --name-only HEAD~1 HEAD -- "*.tex")  # 获取所有修改的 .md 文件
           if [[ -z "$MODIFIED_FILES" ]]; then
             echo "No modified .md files."
             echo "modified=0" >> $GITHUB_ENV  # 记录环境变量，避免后续步骤执行
@@ -51,7 +51,7 @@ jobs:
         run: |
           while IFS= read -r file; do
             output_file="${file%.md}.pdf"  # 将 .md 后缀改为 .pdf
-            pandoc --pdf-engine=xelatex -V CJKmainfont="Noto Sans CJK SC" "$file" -o "$output_file" --template "./eisvogel.latex"
+            xelatex 2.tex -o 2.pdf
             echo "Converted $file -> $output_file"
           done < changed_files.txt
 
