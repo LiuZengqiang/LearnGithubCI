@@ -14,7 +14,6 @@ jobs:
             main.tex
             1.tex
             2.tex
-          args: -output-directory=pdf
       - name: Upload PDF file
         uses: actions/upload-artifact@v4
         with:
